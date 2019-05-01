@@ -1,0 +1,85 @@
+function onOpen() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var menuItems = [
+    {name: 'Fix This Months Summary', functionName: 'showIndividualSummaryPrompt'},
+    {name: 'Prepare Year', functionName: 'addAndLinkSheets'},
+    {name: 'Help', functionName: 'showHelpDialog'}
+  ];
+  spreadsheet.addMenu('Fix Months', menuItems);
+}
+
+function startMonthFixer() {
+  onOpen();
+}
+
+function showIndividualSummaryPrompt() {
+  var ui = SpreadsheetApp.getUi(); // Same variations.
+
+  var result = ui.prompt(
+      'Fix THIS Summary Page!',
+      'Please enter the name of the TRANSACTIONS SHEET for this month:',
+      ui.ButtonSet.OK_CANCEL);
+
+  // Process the user's response.
+  var button = result.getSelectedButton();
+  var text = result.getResponseText();
+  if (button == ui.Button.OK) {
+    // User clicked "OK".
+    modifyExpenses(text);
+    modifyIncome(text);
+  } else if (button == ui.Button.CANCEL) {
+    // User clicked "Cancel".
+    ui.alert('You cancelled this action.');
+  } else if (button == ui.Button.CLOSE) {
+    // User clicked X in the title bar.
+    ui.alert('You closed the dialog.');
+  }
+}
+
+function showHelpDialog() {
+  var ui = SpreadsheetApp.getUi(); // Same variations.
+
+  var result = ui.alert(
+     'Help',
+     '***FIX THIS MONTHS SUMMARY***\nMake sure that you have created a copy of the \"Transactions\" sheet that came with the \"Monthly Budget\" template. Make sure that you are currently on the summary page that you would like to fix.\n***PREPARE YEAR***\nMake sure that you have not deleted or changed the \"Summary\" and \"Transactions\" sheets that came as part of the \"Monthly Budet\" template.',
+      ui.ButtonSet.OK);
+
+  /*// Process the user's response.
+  if (result == ui.Button.YES) {
+    // User clicked "Yes".
+    ui.alert('Confirmation received.');
+  } else {
+    // User clicked "No" or X in the title bar.
+    ui.alert('Permission denied.');
+  }*/
+}
+
+function addAndLinkSheets() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var templateSummary = spreadsheet.getSheetByName('Summary');
+  var templateTransactions = spreadsheet.getSheetByName('Transactions');
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  for (var i = 0; i < 12; i++) {
+    spreadsheet.insertSheet("" + months[i] + "Summary", {template: templateSummary});
+    spreadsheet.insertSheet("" + months[i] + "Transactions", {template: templateTransactions});
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("" + months[i] + "Summary"));
+    modifyExpenses("" + months[i] + "Transactions");
+    modifyIncome("" + months[i] + "Transactions");
+  }
+}
+
+function modifyExpenses(transactionSheet) {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  for (var i = 27; i < 42; i++) {
+    var cell = sheet.getRange("E" + i);
+    cell.setFormula("=if(isblank($B" + i + "), \"\", sumif(" + transactionSheet + "!$E:$E,$B" + i + "," + transactionSheet + "!$C:$C))");
+  }
+}
+
+function modifyIncome(transactionSheet) {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  for (var i = 27; i < 34; i++) {
+    var cell = sheet.getRange("K" + i);
+    cell.setFormula("=if(isblank($H" + i + "), \"\", sumif(" + transactionSheet + "!$J:$J,$H" + i + "," + transactionSheet + "!$H:$H))");
+  }
+}
