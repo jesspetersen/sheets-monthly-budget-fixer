@@ -41,7 +41,7 @@ function showHelpDialog() {
 
   var result = ui.alert(
      'Help',
-     '***FIX THIS MONTHS SUMMARY***\nMake sure that you have created a copy of the \"Transactions\" sheet that came with the \"Monthly Budget\" template. Make sure that you are currently on the summary page that you would like to fix.\n***PREPARE YEAR***\nMake sure that you have not deleted or changed the \"Summary\" and \"Transactions\" sheets that came as part of the \"Monthly Budet\" template.',
+     '***FIX THIS MONTHS SUMMARY***\nMake sure that you have created a copy of the \"Transactions\" sheet that came with the \"Monthly Budget\" template. Make sure that you are currently on the summary page that you would like to fix.\n***PREPARE YEAR***\nMake sure that you have not deleted or changed the name of the \"Summary\" and \"Transactions\" sheets that came as part of the \"Monthly Budet\" template.',
       ui.ButtonSet.OK);
 
   /*// Process the user's response.
